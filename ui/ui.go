@@ -1,7 +1,6 @@
 package ui
 
 import (
-	//"fmt"
 	"errors"
 
 	"github.com/veandco/go-sdl2/sdl"
@@ -127,10 +126,12 @@ func (b *ButtonData) Update(elem *Element) (e error) {
 			b.hover = true
 		}
 	} else {
-		if b.OnUnhover != nil {
-			e = b.OnUnhover(elem)
+		if b.hover {
+			if b.OnUnhover != nil {
+				e = b.OnUnhover(elem)
+			}
+			b.hover = false
 		}
-		b.hover = false
 	}
 
 	return
@@ -172,8 +173,6 @@ func (b ButtonData) Draw(ren *sdl.Renderer) (e error) {
 
 // Update element
 func (e *Element) Update() error {
-	//fmt.Printf("%+v\n", *e)
-
 	switch e.Type {
 	case Button:
 		return e.Data.(*ButtonData).Update(e)

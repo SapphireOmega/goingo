@@ -20,19 +20,19 @@ func createMenu() (m gameMenu, e error) {
 
 	onHover := func(elem *ui.Element) error {
 		elem.Data.(*ui.ButtonData).BgColor = colorBlue
-		//elem.Padding.L *= 0.5
-		//elem.Padding.R *= 0.5
-		//elem.Padding.T *= 0.5
-		//elem.Padding.L *= 0.5
+		elem.Padding.L *= 0.5
+		elem.Padding.R *= 0.5
+		elem.Padding.T *= 0.5
+		elem.Padding.B *= 0.5
 		return nil
 	}
 
 	onUnhover := func(elem *ui.Element) error {
 		elem.Data.(*ui.ButtonData).BgColor = colorGrey
-		//elem.Padding.L *= 2
-		//elem.Padding.R *= 2
-		//elem.Padding.T *= 2
-		//elem.Padding.L *= 2
+		elem.Padding.L *= 2
+		elem.Padding.R *= 2
+		elem.Padding.T *= 2
+		elem.Padding.B *= 2
 		return nil
 	}
 
