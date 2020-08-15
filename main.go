@@ -20,6 +20,7 @@ var (
 	colorDarkBlue = sdl.Color{R:  80, G:  80, B: 150, A: 255}
 
 	menuFont *ttf.Font
+	menuFontZoom *ttf.Font
 
 	win *sdl.Window
 	ren *sdl.Renderer
@@ -78,8 +79,12 @@ func main () {
 	defer ren.Destroy()
 
 	menuFont, err = ttf.OpenFont("test.ttf", 64)
-	checkErrWithMsg(err, "Error opening checkbook font:")
+	checkErrWithMsg(err, "Error opening font:")
 	defer menuFont.Close()
+
+	menuFontZoom, err = ttf.OpenFont("test.ttf", 70)
+	checkErrWithMsg(err, "Error opening font:")
+	defer menuFontZoom.Close()
 
 	state = menuState
 	menu, err = createMenu()

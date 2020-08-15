@@ -1,5 +1,13 @@
 package ui
 
+/*
+TODO:
+-----
+* Check for ElementData update methods wether the fiven Element matches the
+element data
+* Move rect from element specific data to normal element data
+*/
+
 import (
 	"errors"
 
@@ -33,6 +41,7 @@ type ElementType int
 
 const (
 	Button ElementType = iota
+	Column
 )
 
 // A ui element
@@ -60,6 +69,11 @@ type ButtonData struct {
 
 	pressed bool
 	hover   bool
+}
+
+type ColumnData struct {
+	Elems []Element
+	rect sdl.Rect
 }
 
 func (t *Text) Render(ren *sdl.Renderer) error {
@@ -109,12 +123,12 @@ func (b *ButtonData) Update(elem *Element) (e error) {
 	b.rect.W = int32(elem.Bounds.W - pl - pr)
 	b.rect.H = int32(elem.Bounds.H - pt - pb)
 
-	mx, my, ms := sdl.GetMouseState()
-
 	bl := b.rect.X
 	br := b.rect.X + b.rect.W
 	bt := b.rect.Y
 	bb := b.rect.Y + b.rect.H
+
+	mx, my, ms := sdl.GetMouseState()
 
 	if mx >= bl && mx <= br && my >= bt && my <= bb {
 		if ms == 1 && !b.pressed {
@@ -158,11 +172,45 @@ func (b *ButtonData) Draw(ren *sdl.Renderer) error {
 	return b.Text.Draw(ren)
 }
 
+func (c *ColumnData) Update(elem *Element) error {
+	pl := elem.Bounds.W * elem.Padding.L
+	pr := elem.Bounds.W * elem.Padding.R
+	pt := elem.Bounds.H * elem.Padding.T
+	pb := elem.Bounds.H * elem.Padding.B
+
+	c.rect.X = int32(elem.Bounds.X + pl)
+	c.rect.Y = int32(elem.Bounds.Y + pt)
+	c.rect.W = int32(elem.Bounds.W - pl - pr)
+	c.rect.H = int32(elem.Bounds.H - pt - pb)
+
+	for i := 0; i < len(c.Elems); i++ {
+		c.Elems[i].Bounds.X = float64(c.rect.X)
+		c.Elems[i].Bounds.Y = float64(c.rect.Y) + float64(c.rect.H) / float64(len(c.Elems)) * float64(i)
+		c.Elems[i].Bounds.W = float64(c.rect.W)
+		c.Elems[i].Bounds.H = float64(c.rect.H) / float64(len(c.Elems))
+		if err := c.Elems[i].Update(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *ColumnData) Draw(ren *sdl.Renderer) error {
+	for i := 0; i < len(c.Elems); i++ {
+		if err := c.Elems[i].Draw(ren); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Update element
 func (e *Element) Update() error {
 	switch e.Type {
 	case Button:
 		return e.Data.(*ButtonData).Update(e)
+	case Column:
+		return e.Data.(*ColumnData).Update(e)
 	default:
 		return errors.New("Error updating element: unknown element type: " + string(e.Type))
 	}
@@ -173,6 +221,8 @@ func (e *Element) Draw(ren *sdl.Renderer) error {
 	switch e.Type {
 	case Button:
 		return e.Data.(*ButtonData).Draw(ren)
+	case Column:
+		return e.Data.(*ColumnData).Draw(ren)
 	default:
 		return errors.New("Error drawing element: unknown element type: " + string(e.Type))
 	}
