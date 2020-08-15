@@ -66,7 +66,7 @@ func (t *Text) Render(ren *sdl.Renderer) error {
 	var err error
 	var surface *sdl.Surface
 
-	surface, err = t.Font.RenderUTF8Solid(t.Text, t.Color)
+	surface, err = t.Font.RenderUTF8Blended(t.Text, t.Color)
 	if err != nil {
 		return errors.New("Error rendering button text \"" + t.Text + "\": " + err.Error())
 	}
